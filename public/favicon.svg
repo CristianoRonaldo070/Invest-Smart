@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="g" x1="0" y1="64" x2="64" y2="0">
+      <stop offset="0%" stop-color="#3B82F6"/>
+      <stop offset="100%" stop-color="#06B6D4"/>
+    </linearGradient>
+    <linearGradient id="glow" x1="0" y1="64" x2="64" y2="0">
+      <stop offset="0%" stop-color="#3B82F6" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#06B6D4" stop-opacity="0.1"/>
+    </linearGradient>
+  </defs>
+  <!-- Glow area under chart -->
+  <path d="M8 52 L18 42 L28 46 L38 32 L48 28 L56 12 L56 52 Z" fill="url(#glow)"/>
+  <!-- Chart line -->
+  <path d="M8 52 L18 42 L28 46 L38 32 L48 28 L56 12" stroke="url(#g)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Arrow head -->
+  <path d="M50 10 L56 12 L54 6" stroke="url(#g)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <polygon points="56,12 50,10 54,6" fill="url(#g)"/>
+  <!-- Dot at peak -->
+  <circle cx="56" cy="12" r="3" fill="#06B6D4"/>
+  <circle cx="56" cy="12" r="5" fill="#06B6D4" opacity="0.3"/>
+</svg>

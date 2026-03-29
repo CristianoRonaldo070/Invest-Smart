@@ -20,14 +20,17 @@ import type { StockQuote } from "@/hooks/useStockData";
 
 const SECTORS = [
   "All",
-  "Technology",
+  "IT",
+  "Banking",
   "Financial",
-  "Consumer",
-  "Healthcare",
   "Energy",
-  "Entertainment",
-  "Automotive",
-  "Industrial",
+  "FMCG",
+  "Pharma",
+  "Auto",
+  "Telecom",
+  "Metal",
+  "Infrastructure",
+  "Consumer",
 ];
 
 const Home = () => {
@@ -222,7 +225,7 @@ const Home = () => {
                   <input
                     id="stock-search"
                     type="text"
-                    placeholder="Search stocks by name or symbol... (e.g. AAPL, Tesla)"
+                    placeholder="Search stocks by name or symbol... (e.g. RELIANCE, TCS)"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     className="w-full h-12 pl-12 pr-12 rounded-xl bg-card/60 backdrop-blur-xl border border-border/50 text-foreground placeholder:text-muted-foreground/50 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/50 transition-all"

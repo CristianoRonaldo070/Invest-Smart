@@ -44,7 +44,7 @@ function CustomTooltip({ active, payload, label }: any) {
     <div className="glass rounded-lg px-3 py-2 border border-border/60 shadow-lg">
       <p className="text-xs text-muted-foreground mb-1">{label}</p>
       <p className="text-sm font-display font-bold text-foreground">
-        ${payload[0].value.toFixed(2)}
+        ₹{payload[0].value.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
       </p>
     </div>
   );
@@ -159,7 +159,7 @@ export default function StockDetailModal({ stock, onClose }: StockDetailModalPro
             {/* Price */}
             <div className="mt-3">
               <span className="text-3xl font-display font-bold text-foreground">
-                ${stock.price.toFixed(2)}
+                ₹{stock.price.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </span>
               <span
                 className={`ml-3 text-base font-medium ${
@@ -235,7 +235,7 @@ export default function StockDetailModal({ stock, onClose }: StockDetailModalPro
                         axisLine={false}
                         tickLine={false}
                         width={55}
-                        tickFormatter={(v: number) => `$${v.toFixed(0)}`}
+                        tickFormatter={(v: number) => `₹${v.toLocaleString("en-IN")}`}
                       />
                       <Tooltip content={<CustomTooltip />} />
                       <Area
@@ -257,24 +257,24 @@ export default function StockDetailModal({ stock, onClose }: StockDetailModalPro
               <InfoTile
                 icon={<DollarSign className="w-4 h-4" />}
                 label="Open"
-                value={`$${stock.open.toFixed(2)}`}
+                value={`₹${stock.open.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
               />
               <InfoTile
                 icon={<TrendingUp className="w-4 h-4" />}
                 label="High"
-                value={`$${stock.high.toFixed(2)}`}
+                value={`₹${stock.high.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                 highlight="green"
               />
               <InfoTile
                 icon={<TrendingDown className="w-4 h-4" />}
                 label="Low"
-                value={`$${stock.low.toFixed(2)}`}
+                value={`₹${stock.low.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                 highlight="red"
               />
               <InfoTile
                 icon={<Clock className="w-4 h-4" />}
                 label="Prev Close"
-                value={`$${stock.previousClose.toFixed(2)}`}
+                value={`₹${stock.previousClose.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
               />
               <InfoTile
                 icon={<BarChart3 className="w-4 h-4" />}
@@ -300,7 +300,7 @@ export default function StockDetailModal({ stock, onClose }: StockDetailModalPro
                   )
                 }
                 label="Change"
-                value={`${isPositive ? "+" : ""}$${stock.change.toFixed(2)}`}
+                value={`${isPositive ? "+" : ""}₹${Math.abs(stock.change).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                 highlight={isPositive ? "green" : "red"}
               />
             </div>

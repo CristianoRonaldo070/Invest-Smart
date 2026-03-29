@@ -61,10 +61,9 @@ const StockCard = memo(function StockCard({ stock, index, onClick }: StockCardPr
 
   const formattedPrice = useMemo(
     () =>
-      stock.price.toLocaleString("en-US", {
-        style: "currency",
-        currency: "USD",
+      "₹" + stock.price.toLocaleString("en-IN", {
         minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
       }),
     [stock.price]
   );

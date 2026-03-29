@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { MessageCircle, X, Send, Bot, User, Sparkles, Loader2, Trash2 } from "lucide-react";
+import { MessageCircle, X, Send, Bot, User, Sparkles, Loader2, Trash2, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import ReactMarkdown from "react-markdown";
@@ -11,6 +11,7 @@ import { useAuth } from "@/components/ProtectedRoute";
 interface Message {
   role: "user" | "assistant";
   content: string;
+  isError?: boolean;
 }
 
 const quickReplies = [
@@ -22,16 +23,20 @@ const quickReplies = [
   "Tax saving tips for this year",
 ];
 
+const WELCOME_MSG: Message = {
+  role: "assistant",
+  content: "Hey! 👋 I'm your **InvestSmart AI Assistant** powered by Google Gemini. I can see your financial data and give you personalized advice!\n\nAsk me anything about investing, saving, budgeting, or financial planning.",
+};
+
 const AIChatbot = () => {
   const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([
-    { role: "assistant", content: "Hey! 👋 I'm your **InvestSmart AI Assistant** powered by Google Gemini. I can see your financial data and give you personalized advice!\n\nAsk me anything about investing, saving, budgeting, or financial planning." },
-  ]);
+  const [messages, setMessages] = useState<Message[]>([WELCOME_MSG]);
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [financialContext, setFinancialContext] = useState<FinancialContext | undefined>();
   const scrollRef = useRef<HTMLDivElement>(null);
+  const lastFailedMsgRef = useRef<string | null>(null);
 
   // Fetch user's financial data for context
   useEffect(() => {
@@ -39,7 +44,7 @@ const AIChatbot = () => {
     fetchFinancialContext();
   }, [user]);
 
-  // Load chat history from Supabase
+  // Load chat history from Supabase (silent fail if table doesn't exist)
   useEffect(() => {
     if (!user) return;
     loadChatHistory();
@@ -73,32 +78,36 @@ const AIChatbot = () => {
         });
       }
     } catch (err) {
-      console.error("Failed to fetch financial context:", err);
+      // Silently fail — context is optional
+      console.log("Financial context not available:", err);
     }
   };
 
   const loadChatHistory = async () => {
     if (!user) return;
     try {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("chat_messages")
         .select("*")
         .eq("user_id", user.id)
         .order("created_at", { ascending: true })
         .limit(50);
 
+      // If table doesn't exist or any error, silently skip
+      if (error) {
+        console.log("Chat history not available:", error.message);
+        return;
+      }
+
       if (data && data.length > 0) {
         const history: Message[] = data.map((m: any) => ({
           role: m.role as "user" | "assistant",
           content: m.content,
         }));
-        setMessages([
-          { role: "assistant", content: "Hey! 👋 I'm your **InvestSmart AI Assistant** powered by Google Gemini. I can see your financial data and give you personalized advice!\n\nAsk me anything about investing, saving, budgeting, or financial planning." },
-          ...history,
-        ]);
+        setMessages([WELCOME_MSG, ...history]);
       }
     } catch (err) {
-      console.error("Failed to load chat history:", err);
+      console.log("Chat history load skipped:", err);
     }
   };
 
@@ -111,7 +120,8 @@ const AIChatbot = () => {
         content,
       });
     } catch (err) {
-      console.error("Failed to save chat message:", err);
+      // Silently fail — saving history is optional
+      console.log("Chat message save skipped:", err);
     }
   };
 
@@ -119,12 +129,13 @@ const AIChatbot = () => {
     if (!user) return;
     try {
       await supabase.from("chat_messages").delete().eq("user_id", user.id);
-      setMessages([
-        { role: "assistant", content: "Hey! 👋 Chat history cleared! I'm ready to help you with your investment questions." },
-      ]);
     } catch (err) {
-      console.error("Failed to clear chat history:", err);
+      console.log("Chat clear skipped:", err);
     }
+    setMessages([
+      { role: "assistant", content: "Hey! 👋 Chat history cleared! I'm ready to help you with your investment questions." },
+    ]);
+    lastFailedMsgRef.current = null;
   };
 
   useEffect(() => {
@@ -135,32 +146,51 @@ const AIChatbot = () => {
     const msg = text || input.trim();
     if (!msg || isTyping) return;
     setInput("");
+    lastFailedMsgRef.current = null;
 
     const userMsg: Message = { role: "user", content: msg };
     const updatedMessages = [...messages, userMsg];
     setMessages(updatedMessages);
     setIsTyping(true);
 
-    // Save user message to Supabase
-    await saveChatMessage("user", msg);
+    // Save user message (silently)
+    saveChatMessage("user", msg);
 
     try {
-      // Refresh financial context before each message
-      await fetchFinancialContext();
+      // Refresh financial context (non-blocking)
+      fetchFinancialContext();
 
       // Send only actual conversation messages (skip the welcome message)
-      const conversationMessages = updatedMessages.slice(1);
+      const conversationMessages = updatedMessages
+        .slice(1)
+        .filter(m => !m.isError)
+        .map(m => ({ role: m.role, content: m.content }));
+      
       const response = await chatWithGemini(conversationMessages, financialContext);
 
       setMessages(prev => [...prev, { role: "assistant", content: response }]);
-      await saveChatMessage("assistant", response);
+      saveChatMessage("assistant", response);
     } catch (err: any) {
-      console.error("Gemini error:", err);
-      const errorMsg = "Sorry, I'm having trouble connecting right now. Please try again in a moment. 🔄";
-      setMessages(prev => [...prev, { role: "assistant", content: errorMsg }]);
+      console.error("Chat error:", err);
+      // This should rarely happen now since gemini.ts returns fallbacks
+      // But just in case, show a friendly message with retry
+      lastFailedMsgRef.current = msg;
+      setMessages(prev => [...prev, { 
+        role: "assistant", 
+        content: "I'm having a small hiccup! 😅 Don't worry, just tap **Retry** below and I'll try again right away.",
+        isError: true,
+      }]);
     } finally {
       setIsTyping(false);
     }
+  };
+
+  const retryLastMessage = () => {
+    if (!lastFailedMsgRef.current) return;
+    const msg = lastFailedMsgRef.current;
+    // Remove the error message
+    setMessages(prev => prev.filter(m => !m.isError));
+    sendMessage(msg);
   };
 
   return (
@@ -245,6 +275,24 @@ const AIChatbot = () => {
                   </div>
                 </motion.div>
               ))}
+
+              {/* Retry button when error occurred */}
+              {lastFailedMsgRef.current && !isTyping && (
+                <motion.div
+                  className="flex justify-center"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                >
+                  <button
+                    onClick={retryLastMessage}
+                    className="flex items-center gap-2 text-xs bg-primary/15 hover:bg-primary/25 text-primary rounded-full px-4 py-2 transition-colors font-medium"
+                  >
+                    <RefreshCw className="w-3.5 h-3.5" />
+                    Retry Message
+                  </button>
+                </motion.div>
+              )}
+
               {isTyping && (
                 <div className="flex gap-2 items-center">
                   <div className="w-7 h-7 rounded-full gradient-primary flex items-center justify-center">

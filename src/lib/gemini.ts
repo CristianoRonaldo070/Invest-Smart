@@ -1,6 +1,6 @@
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
-const GEMINI_MODEL = 'gemini-2.5-flash';
-const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
+const GEMINI_MODELS = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'];
+const GEMINI_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models';
 
 export interface FinancialContext {
   totalIncome: number;
@@ -89,22 +89,72 @@ ${expenseSummary || '  No expenses recorded yet'}
 Use this data to personalize your advice. Reference their specific numbers when giving suggestions.`;
 }
 
-async function fetchWithRetry(url: string, options: RequestInit, maxRetries = 3): Promise<Response> {
+// Intelligent fallback responses when API is completely unavailable
+const FALLBACK_RESPONSES = [
+  "I'm experiencing some connectivity issues right now, but here are some **general tips** while I reconnect:\n\n📊 **Quick Investment Tips:**\n- Start with a **SIP in index funds** (Nifty 50/Sensex) — even ₹500/month\n- Keep **6 months of expenses** as emergency fund in liquid funds\n- Use **PPF** for guaranteed tax-free returns (Section 80C)\n- Consider **ELSS funds** for tax saving with market-linked returns\n\nI'll be back shortly! Try sending your question again. 🔄",
+  "I'm having a brief hiccup connecting to my brain! 🧠 Here's what I can share right now:\n\n💡 **Smart Money Moves:**\n- **50/30/20 Rule**: 50% needs, 30% wants, 20% savings\n- **NPS** offers additional ₹50,000 tax deduction under 80CCD(1B)\n- Start **SIPs early** — compounding is your best friend\n- **Gold ETFs** are better than physical gold for investment\n\nPlease try again in a moment! 🔄",
+  "Apologies for the brief interruption! Here are some quick insights while I reconnect:\n\n🎯 **Beginner's Investment Checklist:**\n1. Build an **emergency fund** first (3-6 months expenses)\n2. Get **term insurance** and **health insurance**\n3. Start **SIP in a diversified mutual fund**\n4. Maximize **Section 80C** deductions (₹1.5L limit)\n5. Consider **PPF** for long-term debt allocation\n\nTry your question once more — I should be back! 🔄",
+];
+
+let fallbackIndex = 0;
+
+function getSmartFallback(): string {
+  const response = FALLBACK_RESPONSES[fallbackIndex % FALLBACK_RESPONSES.length];
+  fallbackIndex++;
+  return response;
+}
+
+async function fetchWithRetry(url: string, options: RequestInit, maxRetries = 4): Promise<Response> {
+  let lastError: Error | null = null;
+  
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
-    const response = await fetch(url, options);
-    
-    if (response.status === 429 && attempt < maxRetries) {
-      // Rate limited — wait with exponential backoff
-      const waitTime = Math.pow(2, attempt + 1) * 1000 + Math.random() * 1000;
-      console.log(`Rate limited, retrying in ${Math.round(waitTime / 1000)}s (attempt ${attempt + 1}/${maxRetries})`);
-      await new Promise(resolve => setTimeout(resolve, waitTime));
-      continue;
+    try {
+      // Add timeout using AbortController
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30s timeout
+      
+      const response = await fetch(url, {
+        ...options,
+        signal: controller.signal,
+      });
+      
+      clearTimeout(timeoutId);
+      
+      if (response.status === 429 && attempt < maxRetries) {
+        // Rate limited — wait with exponential backoff + jitter
+        const waitTime = Math.pow(2, attempt + 1) * 1000 + Math.random() * 2000;
+        console.log(`Rate limited, retrying in ${Math.round(waitTime / 1000)}s (attempt ${attempt + 1}/${maxRetries})`);
+        await new Promise(resolve => setTimeout(resolve, waitTime));
+        continue;
+      }
+      
+      if (response.status >= 500 && attempt < maxRetries) {
+        // Server error — retry with backoff
+        const waitTime = Math.pow(2, attempt) * 1000 + Math.random() * 1000;
+        console.log(`Server error ${response.status}, retrying in ${Math.round(waitTime / 1000)}s`);
+        await new Promise(resolve => setTimeout(resolve, waitTime));
+        continue;
+      }
+      
+      return response;
+    } catch (err: any) {
+      lastError = err;
+      
+      if (err.name === 'AbortError') {
+        console.log(`Request timed out (attempt ${attempt + 1}/${maxRetries + 1})`);
+      } else {
+        console.log(`Network error (attempt ${attempt + 1}/${maxRetries + 1}):`, err.message);
+      }
+      
+      if (attempt < maxRetries) {
+        const waitTime = Math.pow(2, attempt) * 1000 + Math.random() * 1000;
+        await new Promise(resolve => setTimeout(resolve, waitTime));
+        continue;
+      }
     }
-    
-    return response;
   }
   
-  throw new Error('Max retries exceeded');
+  throw lastError || new Error('Max retries exceeded');
 }
 
 export async function chatWithGemini(
@@ -112,7 +162,8 @@ export async function chatWithGemini(
   financialContext?: FinancialContext
 ): Promise<string> {
   if (!GEMINI_API_KEY) {
-    throw new Error('Gemini API key not configured');
+    // No API key — return helpful fallback instead of crashing
+    return getSmartFallback();
   }
 
   const contextPrompt = buildContextPrompt(financialContext);
@@ -143,26 +194,66 @@ export async function chatWithGemini(
     ],
   };
 
-  const response = await fetchWithRetry(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(requestBody),
-  });
+  // Try multiple models as fallback
+  for (let modelIndex = 0; modelIndex < GEMINI_MODELS.length; modelIndex++) {
+    const model = GEMINI_MODELS[modelIndex];
+    const apiUrl = `${GEMINI_BASE_URL}/${model}:generateContent?key=${GEMINI_API_KEY}`;
+    
+    try {
+      const response = await fetchWithRetry(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestBody),
+      });
 
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    console.error('Gemini API error:', errorData);
-    throw new Error(`Gemini API error: ${response.status}`);
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error(`Gemini API error (${model}):`, errorData);
+        
+        // If model not found or invalid, try next model
+        if (response.status === 404 || response.status === 400) {
+          console.log(`Model ${model} failed, trying next...`);
+          continue;
+        }
+        
+        // For other errors, try next model too
+        if (modelIndex < GEMINI_MODELS.length - 1) {
+          console.log(`Model ${model} returned ${response.status}, trying next...`);
+          continue;
+        }
+        
+        // All models failed — return smart fallback
+        return getSmartFallback();
+      }
+
+      const data = await response.json();
+      const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+
+      if (!text) {
+        // Safety filter or empty response — try next model
+        if (modelIndex < GEMINI_MODELS.length - 1) {
+          console.log(`Model ${model} returned empty, trying next...`);
+          continue;
+        }
+        return getSmartFallback();
+      }
+
+      return text;
+    } catch (err: any) {
+      console.error(`Error with model ${model}:`, err);
+      
+      if (modelIndex < GEMINI_MODELS.length - 1) {
+        console.log(`Model ${model} errored, trying next...`);
+        continue;
+      }
+      
+      // All models exhausted — return smart fallback instead of throwing
+      return getSmartFallback();
+    }
   }
 
-  const data = await response.json();
-  const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-
-  if (!text) {
-    throw new Error('No response from Gemini');
-  }
-
-  return text;
+  // Should never reach here, but just in case
+  return getSmartFallback();
 }
 
 export async function getInvestmentSuggestions(context: FinancialContext): Promise<string> {

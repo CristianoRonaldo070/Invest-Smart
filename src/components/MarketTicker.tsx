@@ -35,7 +35,7 @@ const MarketTicker = memo(function MarketTicker({ stocks }: MarketTickerProps) {
                 {stock.symbol}
               </span>
               <span className="text-xs text-muted-foreground">
-                ${stock.price.toFixed(2)}
+                ₹{stock.price.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </span>
               <span
                 className={`flex items-center gap-0.5 text-[11px] font-medium ${

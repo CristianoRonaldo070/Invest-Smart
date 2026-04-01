@@ -305,19 +305,64 @@ const Savings = () => {
             )}
 
             {aiSuggestions && !loadingSuggestions && (
-              <div className="prose prose-sm prose-invert max-w-none 
-                [&_h1]:text-xl [&_h1]:font-display [&_h1]:text-foreground [&_h1]:mb-3
-                [&_h2]:text-lg [&_h2]:font-display [&_h2]:text-foreground [&_h2]:mt-6 [&_h2]:mb-3
-                [&_h3]:text-base [&_h3]:font-display [&_h3]:text-foreground [&_h3]:mt-4 [&_h3]:mb-2
-                [&_p]:text-muted-foreground [&_p]:text-sm [&_p]:leading-relaxed
-                [&_li]:text-muted-foreground [&_li]:text-sm
-                [&_strong]:text-foreground
-                [&_table]:text-sm [&_th]:text-primary [&_th]:text-left [&_th]:pb-2 [&_th]:pr-4
-                [&_td]:text-muted-foreground [&_td]:py-1.5 [&_td]:pr-4 [&_td]:border-t [&_td]:border-border/30
-                [&_blockquote]:border-l-primary [&_blockquote]:text-muted-foreground
-                [&_code]:text-primary [&_code]:bg-primary/10 [&_code]:px-1 [&_code]:rounded
-              ">
-                <ReactMarkdown>{aiSuggestions}</ReactMarkdown>
+              <div className="relative">
+                {/* Scrollable suggestion content */}
+                <div className="max-h-[75vh] overflow-y-auto pr-2 scroll-smooth
+                  [&::-webkit-scrollbar]:w-1.5
+                  [&::-webkit-scrollbar-track]:bg-transparent
+                  [&::-webkit-scrollbar-thumb]:bg-primary/20
+                  [&::-webkit-scrollbar-thumb]:rounded-full
+                  hover:[&::-webkit-scrollbar-thumb]:bg-primary/40
+                ">
+                  <div className="prose prose-invert max-w-none space-y-1
+
+                    [&_h1]:text-2xl [&_h1]:font-display [&_h1]:font-bold [&_h1]:text-foreground 
+                    [&_h1]:mb-4 [&_h1]:mt-2 [&_h1]:pb-3 [&_h1]:border-b [&_h1]:border-primary/20
+
+                    [&_h2]:text-xl [&_h2]:font-display [&_h2]:font-semibold [&_h2]:text-foreground 
+                    [&_h2]:mt-8 [&_h2]:mb-4 [&_h2]:pl-4 [&_h2]:py-2
+                    [&_h2]:border-l-[3px] [&_h2]:border-l-primary
+                    [&_h2]:bg-primary/5 [&_h2]:rounded-r-lg
+
+                    [&_h3]:text-lg [&_h3]:font-display [&_h3]:font-medium [&_h3]:text-foreground 
+                    [&_h3]:mt-6 [&_h3]:mb-3 [&_h3]:pl-3
+                    [&_h3]:border-l-2 [&_h3]:border-l-primary/50
+
+                    [&_p]:text-[0.9rem] [&_p]:text-muted-foreground [&_p]:leading-7 [&_p]:mb-3
+
+                    [&_li]:text-[0.9rem] [&_li]:text-muted-foreground [&_li]:leading-7 [&_li]:mb-1.5
+                    [&_ul]:space-y-1 [&_ul]:my-3 [&_ul]:pl-1
+                    [&_ol]:space-y-2 [&_ol]:my-3 [&_ol]:pl-1
+                    [&_li]:pl-1
+
+                    [&_strong]:text-foreground [&_strong]:font-semibold
+
+                    [&_table]:w-full [&_table]:my-4 [&_table]:text-sm [&_table]:border-collapse
+                    [&_table]:rounded-xl [&_table]:overflow-hidden [&_table]:block [&_table]:overflow-x-auto
+                    [&_thead]:bg-primary/10
+                    [&_th]:text-primary [&_th]:font-semibold [&_th]:text-left 
+                    [&_th]:px-4 [&_th]:py-3 [&_th]:whitespace-nowrap [&_th]:text-xs [&_th]:uppercase [&_th]:tracking-wider
+                    [&_td]:text-muted-foreground [&_td]:px-4 [&_td]:py-3 
+                    [&_td]:border-t [&_td]:border-border/20 [&_td]:whitespace-nowrap
+                    [&_tr]:transition-colors [&_tbody_tr:hover]:bg-secondary/30
+
+                    [&_blockquote]:border-l-2 [&_blockquote]:border-l-primary/60 
+                    [&_blockquote]:bg-primary/5 [&_blockquote]:rounded-r-lg
+                    [&_blockquote]:pl-4 [&_blockquote]:py-3 [&_blockquote]:my-4
+                    [&_blockquote]:text-muted-foreground [&_blockquote]:italic
+
+                    [&_code]:text-primary [&_code]:bg-primary/10 [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:rounded-md [&_code]:text-xs [&_code]:font-mono
+
+                    [&_hr]:border-border/30 [&_hr]:my-6
+
+                    [&_a]:text-primary [&_a]:underline [&_a]:underline-offset-2 hover:[&_a]:text-primary/80
+                  ">
+                    <ReactMarkdown>{aiSuggestions}</ReactMarkdown>
+                  </div>
+                </div>
+
+                {/* Bottom fade gradient to indicate scrollability */}
+                <div className="absolute bottom-0 left-0 right-2 h-8 bg-gradient-to-t from-card/80 to-transparent pointer-events-none rounded-b-xl" />
               </div>
             )}
 

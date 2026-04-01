@@ -1,5 +1,5 @@
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
-const GEMINI_MODELS = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'];
+const GEMINI_MODELS = ['gemini-2.0-flash', 'gemini-1.5-flash'];
 const GEMINI_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models';
 
 export interface FinancialContext {
@@ -111,7 +111,7 @@ async function fetchWithRetry(url: string, options: RequestInit, maxRetries = 4)
     try {
       // Add timeout using AbortController
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30s timeout
+      const timeoutId = setTimeout(() => controller.abort(), 45000); // 45s timeout
       
       const response = await fetch(url, {
         ...options,

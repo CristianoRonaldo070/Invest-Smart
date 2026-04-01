@@ -31,30 +31,30 @@ export interface CandleData {
 
 // ─── Indian Stock Universe (NSE) ────────────────────────
 const STOCKS_INFO: Record<string, { name: string; sector: string; marketCap: string; yahoo: string }> = {
-  RELIANCE:   { name: "Reliance Industries",       sector: "Energy",          marketCap: "₹19.8L Cr", yahoo: "RELIANCE.NS" },
-  TCS:        { name: "Tata Consultancy Services",  sector: "IT",              marketCap: "₹15.2L Cr", yahoo: "TCS.NS" },
-  HDFCBANK:   { name: "HDFC Bank Ltd.",             sector: "Banking",         marketCap: "₹13.5L Cr", yahoo: "HDFCBANK.NS" },
-  INFY:       { name: "Infosys Ltd.",               sector: "IT",              marketCap: "₹7.4L Cr",  yahoo: "INFY.NS" },
-  ICICIBANK:  { name: "ICICI Bank Ltd.",            sector: "Banking",         marketCap: "₹9.1L Cr",  yahoo: "ICICIBANK.NS" },
-  HINDUNILVR: { name: "Hindustan Unilever",         sector: "FMCG",            marketCap: "₹5.8L Cr",  yahoo: "HINDUNILVR.NS" },
-  SBIN:       { name: "State Bank of India",        sector: "Banking",         marketCap: "₹7.2L Cr",  yahoo: "SBIN.NS" },
-  BHARTIARTL: { name: "Bharti Airtel Ltd.",         sector: "Telecom",         marketCap: "₹8.9L Cr",  yahoo: "BHARTIARTL.NS" },
-  ITC:        { name: "ITC Ltd.",                   sector: "FMCG",            marketCap: "₹5.6L Cr",  yahoo: "ITC.NS" },
-  KOTAKBANK:  { name: "Kotak Mahindra Bank",        sector: "Banking",         marketCap: "₹3.9L Cr",  yahoo: "KOTAKBANK.NS" },
-  LT:         { name: "Larsen & Toubro",            sector: "Infrastructure",  marketCap: "₹5.1L Cr",  yahoo: "LT.NS" },
-  HCLTECH:    { name: "HCL Technologies",           sector: "IT",              marketCap: "₹4.1L Cr",  yahoo: "HCLTECH.NS" },
-  AXISBANK:   { name: "Axis Bank Ltd.",             sector: "Banking",         marketCap: "₹3.6L Cr",  yahoo: "AXISBANK.NS" },
-  SUNPHARMA:  { name: "Sun Pharmaceutical",         sector: "Pharma",          marketCap: "₹4.3L Cr",  yahoo: "SUNPHARMA.NS" },
-  MARUTI:     { name: "Maruti Suzuki India",         sector: "Auto",            marketCap: "₹3.8L Cr",  yahoo: "MARUTI.NS" },
-  TATAMOTORS: { name: "Tata Motors Ltd.",            sector: "Auto",            marketCap: "₹3.1L Cr",  yahoo: "TATAMOTORS.NS" },
-  WIPRO:      { name: "Wipro Ltd.",                  sector: "IT",              marketCap: "₹2.6L Cr",  yahoo: "WIPRO.NS" },
-  NTPC:       { name: "NTPC Ltd.",                   sector: "Energy",          marketCap: "₹3.5L Cr",  yahoo: "NTPC.NS" },
-  TATASTEEL:  { name: "Tata Steel Ltd.",             sector: "Metal",           marketCap: "₹1.9L Cr",  yahoo: "TATASTEEL.NS" },
-  POWERGRID:  { name: "Power Grid Corp.",            sector: "Energy",          marketCap: "₹2.8L Cr",  yahoo: "POWERGRID.NS" },
-  BAJFINANCE: { name: "Bajaj Finance Ltd.",          sector: "Financial",       marketCap: "₹4.6L Cr",  yahoo: "BAJFINANCE.NS" },
-  DRREDDY:    { name: "Dr. Reddy's Labs",            sector: "Pharma",          marketCap: "₹1.1L Cr",  yahoo: "DRREDDY.NS" },
-  ADANIENT:   { name: "Adani Enterprises",           sector: "Infrastructure",  marketCap: "₹3.4L Cr",  yahoo: "ADANIENT.NS" },
-  TITAN:      { name: "Titan Company Ltd.",           sector: "Consumer",        marketCap: "₹3.2L Cr",  yahoo: "TITAN.NS" },
+  RELIANCE: { name: "Reliance Industries", sector: "Energy", marketCap: "₹19.8L Cr", yahoo: "RELIANCE.NS" },
+  TCS: { name: "Tata Consultancy Services", sector: "IT", marketCap: "₹15.2L Cr", yahoo: "TCS.NS" },
+  HDFCBANK: { name: "HDFC Bank Ltd.", sector: "Banking", marketCap: "₹13.5L Cr", yahoo: "HDFCBANK.NS" },
+  INFY: { name: "Infosys Ltd.", sector: "IT", marketCap: "₹7.4L Cr", yahoo: "INFY.NS" },
+  ICICIBANK: { name: "ICICI Bank Ltd.", sector: "Banking", marketCap: "₹9.1L Cr", yahoo: "ICICIBANK.NS" },
+  HINDUNILVR: { name: "Hindustan Unilever", sector: "FMCG", marketCap: "₹5.8L Cr", yahoo: "HINDUNILVR.NS" },
+  SBIN: { name: "State Bank of India", sector: "Banking", marketCap: "₹7.2L Cr", yahoo: "SBIN.NS" },
+  BHARTIARTL: { name: "Bharti Airtel Ltd.", sector: "Telecom", marketCap: "₹8.9L Cr", yahoo: "BHARTIARTL.NS" },
+  ITC: { name: "ITC Ltd.", sector: "FMCG", marketCap: "₹5.6L Cr", yahoo: "ITC.NS" },
+  KOTAKBANK: { name: "Kotak Mahindra Bank", sector: "Banking", marketCap: "₹3.9L Cr", yahoo: "KOTAKBANK.NS" },
+  LT: { name: "Larsen & Toubro", sector: "Infrastructure", marketCap: "₹5.1L Cr", yahoo: "LT.NS" },
+  HCLTECH: { name: "HCL Technologies", sector: "IT", marketCap: "₹4.1L Cr", yahoo: "HCLTECH.NS" },
+  AXISBANK: { name: "Axis Bank Ltd.", sector: "Banking", marketCap: "₹3.6L Cr", yahoo: "AXISBANK.NS" },
+  SUNPHARMA: { name: "Sun Pharmaceutical", sector: "Pharma", marketCap: "₹4.3L Cr", yahoo: "SUNPHARMA.NS" },
+  MARUTI: { name: "Maruti Suzuki India", sector: "Auto", marketCap: "₹3.8L Cr", yahoo: "MARUTI.NS" },
+  TATAMOTORS: { name: "Tata Motors Ltd.", sector: "Auto", marketCap: "₹3.1L Cr", yahoo: "TATAMOTORS.NS" },
+  WIPRO: { name: "Wipro Ltd.", sector: "IT", marketCap: "₹2.6L Cr", yahoo: "WIPRO.NS" },
+  NTPC: { name: "NTPC Ltd.", sector: "Energy", marketCap: "₹3.5L Cr", yahoo: "NTPC.NS" },
+  TATASTEEL: { name: "Tata Steel Ltd.", sector: "Metal", marketCap: "₹1.9L Cr", yahoo: "TATASTEEL.NS" },
+  POWERGRID: { name: "Power Grid Corp.", sector: "Energy", marketCap: "₹2.8L Cr", yahoo: "POWERGRID.NS" },
+  BAJFINANCE: { name: "Bajaj Finance Ltd.", sector: "Financial", marketCap: "₹4.6L Cr", yahoo: "BAJFINANCE.NS" },
+  DRREDDY: { name: "Dr. Reddy's Labs", sector: "Pharma", marketCap: "₹1.1L Cr", yahoo: "DRREDDY.NS" },
+  ADANIENT: { name: "Adani Enterprises", sector: "Infrastructure", marketCap: "₹3.4L Cr", yahoo: "ADANIENT.NS" },
+  TITAN: { name: "Titan Company Ltd.", sector: "Consumer", marketCap: "₹3.2L Cr", yahoo: "TITAN.NS" },
 };
 
 export const ALL_SYMBOLS = Object.keys(STOCKS_INFO);
@@ -116,61 +116,61 @@ async function fetchYahooQuote(yahooSymbol: string): Promise<{
   marketCap: number;
 } | null> {
   const url = `https://query1.finance.yahoo.com/v8/finance/chart/${yahooSymbol}?interval=1d&range=1d`;
-  
+
   // Try each proxy
   for (let attempt = 0; attempt < CORS_PROXIES.length; attempt++) {
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
-      
+
       const proxyUrl = getProxyUrl(url);
       const res = await fetch(proxyUrl, { signal: controller.signal });
       clearTimeout(timeoutId);
-      
+
       if (!res.ok) {
         rotateProxy();
         continue;
       }
-      
+
       const data = await res.json();
       const result = data?.chart?.result?.[0];
       if (!result) {
         rotateProxy();
         continue;
       }
-      
+
       const meta = result.meta;
       const quote = result.indicators?.quote?.[0];
-      
+
       if (!meta || !meta.regularMarketPrice) {
         rotateProxy();
         continue;
       }
-      
+
       const currentPrice = meta.regularMarketPrice;
       const prevClose = meta.chartPreviousClose || meta.previousClose || currentPrice;
-      
+
       // Get today's OHLCV from the quote data
       let todayHigh = currentPrice;
       let todayLow = currentPrice;
       let todayOpen = prevClose;
       let todayVolume = 0;
-      
+
       if (quote) {
         const highs = quote.high?.filter((v: number | null) => v != null) || [];
         const lows = quote.low?.filter((v: number | null) => v != null) || [];
         const opens = quote.open?.filter((v: number | null) => v != null) || [];
         const volumes = quote.volume?.filter((v: number | null) => v != null) || [];
-        
+
         if (highs.length > 0) todayHigh = Math.max(...highs);
         if (lows.length > 0) todayLow = Math.min(...lows);
         if (opens.length > 0) todayOpen = opens[0];
         if (volumes.length > 0) todayVolume = volumes.reduce((a: number, b: number) => a + b, 0);
       }
-      
+
       const change = parseFloat((currentPrice - prevClose).toFixed(2));
       const changePercent = parseFloat(((change / prevClose) * 100).toFixed(2));
-      
+
       return {
         price: parseFloat(currentPrice.toFixed(2)),
         change,
@@ -188,7 +188,7 @@ async function fetchYahooQuote(yahooSymbol: string): Promise<{
       continue;
     }
   }
-  
+
   return null;
 }
 
@@ -201,11 +201,11 @@ export async function fetchCandles(
 ): Promise<CandleData[]> {
   const info = STOCKS_INFO[symbol];
   if (!info) return generateSimCandles(SIM_PRICES[symbol] || 1000, resolution);
-  
+
   // Map resolution to Yahoo Finance params
   let interval = "1d";
   let range = "1mo";
-  
+
   if (resolution === "5" || resolution === "15") {
     interval = resolution + "m";
     range = "1d";
@@ -221,45 +221,45 @@ export async function fetchCandles(
     interval = "1wk";
     range = "1y";
   }
-  
+
   const url = `https://query1.finance.yahoo.com/v8/finance/chart/${info.yahoo}?interval=${interval}&range=${range}`;
-  
+
   for (let attempt = 0; attempt < CORS_PROXIES.length; attempt++) {
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 10000);
-      
+
       const res = await fetch(getProxyUrl(url), { signal: controller.signal });
       clearTimeout(timeoutId);
-      
+
       if (!res.ok) {
         rotateProxy();
         continue;
       }
-      
+
       const data = await res.json();
       const result = data?.chart?.result?.[0];
       if (!result || !result.timestamp) {
         rotateProxy();
         continue;
       }
-      
+
       const timestamps = result.timestamp;
       const quote = result.indicators?.quote?.[0];
       if (!quote) {
         rotateProxy();
         continue;
       }
-      
+
       const candles: CandleData[] = [];
       for (let i = 0; i < timestamps.length; i++) {
         if (quote.close[i] == null) continue;
-        
+
         const t = new Date(timestamps[i] * 1000);
         const timeLabel = interval.includes("m")
           ? t.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
           : t.toLocaleDateString([], { month: "short", day: "numeric" });
-        
+
         candles.push({
           time: timeLabel,
           open: quote.open[i] || quote.close[i],
@@ -269,7 +269,7 @@ export async function fetchCandles(
           volume: quote.volume[i] || 0,
         });
       }
-      
+
       if (candles.length > 0) return candles;
       rotateProxy();
     } catch (err) {
@@ -277,7 +277,7 @@ export async function fetchCandles(
       rotateProxy();
     }
   }
-  
+
   // Fallback to simulated candles
   return generateSimCandles(SIM_PRICES[symbol] || 1000, resolution);
 }
@@ -373,14 +373,14 @@ export function useStockData() {
   // ── Fetch real quotes from Yahoo Finance ──
   const fetchAllQuotes = useCallback(async () => {
     let anySuccess = false;
-    
+
     for (let i = 0; i < ALL_SYMBOLS.length; i++) {
       const sym = ALL_SYMBOLS[i];
       const info = STOCKS_INFO[sym];
-      
+
       try {
         const quote = await fetchYahooQuote(info.yahoo);
-        
+
         if (quote && quote.price > 0) {
           anySuccess = true;
           setStocks((prev) =>
@@ -417,13 +417,13 @@ export function useStockData() {
           prev.map((s) => (s.symbol === sym ? { ...s, loading: false } : s))
         );
       }
-      
+
       // Small delay between requests to avoid rate limits (300ms)
       if (i < ALL_SYMBOLS.length - 1) {
         await new Promise((r) => setTimeout(r, 300));
       }
     }
-    
+
     if (anySuccess) {
       hasRealDataRef.current = true;
       setIsLive(true);

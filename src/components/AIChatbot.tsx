@@ -266,7 +266,7 @@ const AIChatbot = () => {
                   </div>
                   <div className={`max-w-[80%] rounded-xl px-3 py-2 text-sm ${msg.role === "user" ? "bg-primary text-primary-foreground" : "bg-secondary"}`}>
                     {msg.role === "assistant" ? (
-                      <div className="prose prose-sm prose-invert max-w-none [&_h2]:text-base [&_h2]:mt-1 [&_h2]:mb-2 [&_h3]:text-sm [&_p]:text-xs [&_li]:text-xs [&_table]:text-xs [&_blockquote]:text-xs [&_strong]:text-foreground [&_code]:text-primary [&_code]:bg-primary/10 [&_code]:px-1 [&_code]:rounded">
+                      <div className="prose prose-sm prose-invert max-w-none [&_h2]:text-sm [&_h2]:font-semibold [&_h2]:mt-2 [&_h2]:mb-1.5 [&_h3]:text-[13px] [&_h3]:font-medium [&_p]:text-[13px] [&_p]:leading-relaxed [&_p]:mb-1.5 [&_li]:text-[13px] [&_li]:leading-relaxed [&_li]:mb-0.5 [&_table]:text-xs [&_blockquote]:text-[13px] [&_strong]:text-foreground [&_code]:text-primary [&_code]:bg-primary/10 [&_code]:px-1 [&_code]:rounded [&_table]:my-2 [&_th]:text-primary/80 [&_th]:text-left [&_th]:pb-1 [&_th]:pr-3 [&_td]:py-1 [&_td]:pr-3 [&_td]:border-t [&_td]:border-border/20 [&_ul]:my-1.5 [&_ol]:my-1.5">
                         <ReactMarkdown>{msg.content}</ReactMarkdown>
                       </div>
                     ) : (

@@ -55,19 +55,21 @@ export default function StockDetailModal({ stock, onClose }: StockDetailModalPro
   const [candles, setCandles] = useState<CandleData[]>([]);
   const [loadingChart, setLoadingChart] = useState(true);
 
+  // Only re-fetch candles when symbol or timeframe changes (NOT on every price tick)
+  const stockSymbol = stock?.symbol;
   useEffect(() => {
-    if (!stock) return;
+    if (!stockSymbol) return;
 
     setLoadingChart(true);
     const tf = TIMEFRAMES[timeframe];
     const to = Math.floor(Date.now() / 1000);
     const from = to - tf.days * 86400;
 
-    fetchCandles(stock.symbol, tf.resolution, from, to).then((data) => {
+    fetchCandles(stockSymbol, tf.resolution, from, to).then((data) => {
       setCandles(data);
       setLoadingChart(false);
     });
-  }, [stock, timeframe]);
+  }, [stockSymbol, timeframe]);
 
   // Close on Escape
   useEffect(() => {

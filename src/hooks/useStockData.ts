@@ -282,18 +282,29 @@ export async function fetchCandles(
   return generateSimCandles(SIM_PRICES[symbol] || 1000, resolution);
 }
 
+// Simple seeded random number generator for deterministic data
+function seededRandom(seed: number): () => number {
+  let s = seed;
+  return () => {
+    s = (s * 16807 + 0) % 2147483647;
+    return (s - 1) / 2147483646;
+  };
+}
+
 function generateSimCandles(basePrice: number, resolution: string): CandleData[] {
   const count = resolution === "D" ? 30 : resolution === "W" ? 52 : resolution === "M" ? 12 : 78;
   const candles: CandleData[] = [];
-  let price = basePrice * (0.92 + Math.random() * 0.06);
+  // Use basePrice as seed for deterministic results
+  const rand = seededRandom(Math.floor(basePrice * 100));
+  let price = basePrice * (0.92 + rand() * 0.06);
 
   for (let i = 0; i < count; i++) {
     const vol = basePrice * 0.005;
     const o = price;
-    const change1 = (Math.random() - 0.47) * vol;
+    const change1 = (rand() - 0.47) * vol;
     const c = parseFloat((o + change1).toFixed(2));
-    const h = parseFloat((Math.max(o, c) + Math.random() * vol * 0.5).toFixed(2));
-    const l = parseFloat((Math.min(o, c) - Math.random() * vol * 0.5).toFixed(2));
+    const h = parseFloat((Math.max(o, c) + rand() * vol * 0.5).toFixed(2));
+    const l = parseFloat((Math.min(o, c) - rand() * vol * 0.5).toFixed(2));
     price = c;
 
     const t = new Date();
@@ -310,7 +321,7 @@ function generateSimCandles(basePrice: number, resolution: string): CandleData[]
       high: h,
       low: l,
       close: c,
-      volume: Math.floor(Math.random() * 5e6 + 1e6),
+      volume: Math.floor(rand() * 5e6 + 1e6),
     });
   }
 
@@ -320,12 +331,13 @@ function generateSimCandles(basePrice: number, resolution: string): CandleData[]
   return candles;
 }
 
-// ─── Generate sparkline from sim prices ─────────────────
+// ─── Generate sparkline from sim prices (deterministic) ─
 function genSparkline(price: number): number[] {
   const pts: number[] = [];
-  let p = price * (0.96 + Math.random() * 0.03);
+  const rand = seededRandom(Math.floor(price * 137));
+  let p = price * (0.96 + rand() * 0.03);
   for (let i = 0; i < 20; i++) {
-    p += (Math.random() - 0.47) * price * 0.003;
+    p += (rand() - 0.47) * price * 0.003;
     pts.push(parseFloat(p.toFixed(2)));
   }
   pts.push(price);
@@ -438,38 +450,8 @@ export function useStockData() {
     setLastUpdate(new Date());
   }, []);
 
-  // ── Simulated ticks for smooth movement between real data refreshes ──
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setStocks((prev) =>
-        prev.map((s) => {
-          // Smaller movement for real data (just visual smoothing)
-          // Larger movement for simulated data
-          const volatility = s.isReal ? 0.0003 : 0.0012;
-          const vol = s.price * volatility;
-          const delta = (Math.random() - 0.48) * vol;
-          const newPrice = parseFloat((s.price + delta).toFixed(2));
-          const change = parseFloat((newPrice - (s.isReal ? s.previousClose : s.open)).toFixed(2));
-          const base = s.isReal ? s.previousClose : s.open;
-          const changePercent = parseFloat(((change / base) * 100).toFixed(2));
-
-          return {
-            ...s,
-            price: newPrice,
-            change,
-            changePercent,
-            high: Math.max(s.high, newPrice),
-            low: Math.min(s.low, newPrice),
-            sparkline: [...s.sparkline.slice(-19), newPrice],
-            lastTick: Date.now(),
-          };
-        })
-      );
-      setLastUpdate(new Date());
-    }, 3000);
-
-    return () => clearInterval(interval);
-  }, []);
+  // NOTE: No simulated ticks — prices stay stable between real Yahoo Finance refreshes.
+  // This prevents chart fluctuations and erratic price movements.
 
   // ── Initial fetch + periodic refresh ──
   useEffect(() => {

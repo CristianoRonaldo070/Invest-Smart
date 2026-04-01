@@ -112,6 +112,20 @@ const Savings = () => {
     }
   };
 
+  // Load cached AI suggestions on mount
+  useEffect(() => {
+    try {
+      const cached = localStorage.getItem("ai_suggestions_cache");
+      if (cached) {
+        const { text, timestamp } = JSON.parse(cached);
+        // Use cache if less than 30 minutes old
+        if (Date.now() - timestamp < 30 * 60 * 1000 && text) {
+          setAiSuggestions(text);
+        }
+      }
+    } catch (_) {}
+  }, []);
+
   const getAISuggestions = async () => {
     if (savings <= 0) return;
     setLoadingSuggestions(true);
@@ -134,8 +148,12 @@ const Savings = () => {
     try {
       const result = await getInvestmentSuggestions(context);
       setAiSuggestions(result);
+      // Cache the result
+      try {
+        localStorage.setItem("ai_suggestions_cache", JSON.stringify({ text: result, timestamp: Date.now() }));
+      } catch (_) {}
     } catch (err: any) {
-      setSuggestionsError("Failed to get AI suggestions. Please try again.");
+      setSuggestionsError("Failed to get AI suggestions. Please try again in 1-2 minutes.");
       console.error(err);
     } finally {
       setLoadingSuggestions(false);

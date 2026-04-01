@@ -1,5 +1,5 @@
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
-const GEMINI_MODELS = ['gemini-2.0-flash', 'gemini-1.5-flash'];
+const GEMINI_MODELS = ['gemini-2.0-flash', 'gemini-2.0-flash-lite', 'gemini-1.5-flash'];
 const GEMINI_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models';
 
 export interface FinancialContext {
@@ -91,9 +91,9 @@ Use this data to personalize your advice. Reference their specific numbers when 
 
 // Intelligent fallback responses when API is completely unavailable
 const FALLBACK_RESPONSES = [
-  "I'm experiencing some connectivity issues right now, but here are some **general tips** while I reconnect:\n\n📊 **Quick Investment Tips:**\n- Start with a **SIP in index funds** (Nifty 50/Sensex) — even ₹500/month\n- Keep **6 months of expenses** as emergency fund in liquid funds\n- Use **PPF** for guaranteed tax-free returns (Section 80C)\n- Consider **ELSS funds** for tax saving with market-linked returns\n\nI'll be back shortly! Try sending your question again. 🔄",
-  "I'm having a brief hiccup connecting to my brain! 🧠 Here's what I can share right now:\n\n💡 **Smart Money Moves:**\n- **50/30/20 Rule**: 50% needs, 30% wants, 20% savings\n- **NPS** offers additional ₹50,000 tax deduction under 80CCD(1B)\n- Start **SIPs early** — compounding is your best friend\n- **Gold ETFs** are better than physical gold for investment\n\nPlease try again in a moment! 🔄",
-  "Apologies for the brief interruption! Here are some quick insights while I reconnect:\n\n🎯 **Beginner's Investment Checklist:**\n1. Build an **emergency fund** first (3-6 months expenses)\n2. Get **term insurance** and **health insurance**\n3. Start **SIP in a diversified mutual fund**\n4. Maximize **Section 80C** deductions (₹1.5L limit)\n5. Consider **PPF** for long-term debt allocation\n\nTry your question once more — I should be back! 🔄",
+  "⚠️ **API rate limit reached** — Google's free Gemini tier has per-minute request limits. Here are some **investment tips** while the limit resets (usually 1-2 minutes):\n\n📊 **Quick Investment Tips:**\n- Start with a **SIP in index funds** (Nifty 50/Sensex) — even ₹500/month\n- Keep **6 months of expenses** as emergency fund in liquid funds\n- Use **PPF** for guaranteed tax-free returns (Section 80C)\n- Consider **ELSS funds** for tax saving with market-linked returns\n\n💡 Try again in **1-2 minutes** and it should work! 🔄",
+  "⚠️ **Too many requests** — The AI needs a brief cooldown. Here's what I can share right now:\n\n💡 **Smart Money Moves:**\n- **50/30/20 Rule**: 50% needs, 30% wants, 20% savings\n- **NPS** offers additional ₹50,000 tax deduction under 80CCD(1B)\n- Start **SIPs early** — compounding is your best friend\n- **Gold ETFs** are better than physical gold for investment\n\n⏰ Wait **1-2 minutes** then try again! 🔄",
+  "⚠️ **Rate limited** — Please wait a moment before retrying. Here are quick insights:\n\n🎯 **Beginner's Investment Checklist:**\n1. Build an **emergency fund** first (3-6 months expenses)\n2. Get **term insurance** and **health insurance**\n3. Start **SIP in a diversified mutual fund**\n4. Maximize **Section 80C** deductions (₹1.5L limit)\n5. Consider **PPF** for long-term debt allocation\n\n⏰ Try again in **1-2 minutes**! 🔄",
 ];
 
 let fallbackIndex = 0;
@@ -104,14 +104,14 @@ function getSmartFallback(): string {
   return response;
 }
 
-async function fetchWithRetry(url: string, options: RequestInit, maxRetries = 4): Promise<Response> {
+async function fetchWithRetry(url: string, options: RequestInit, maxRetries = 2): Promise<Response> {
   let lastError: Error | null = null;
   
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
       // Add timeout using AbortController
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 45000); // 45s timeout
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30s timeout
       
       const response = await fetch(url, {
         ...options,
@@ -121,8 +121,8 @@ async function fetchWithRetry(url: string, options: RequestInit, maxRetries = 4)
       clearTimeout(timeoutId);
       
       if (response.status === 429 && attempt < maxRetries) {
-        // Rate limited — wait with exponential backoff + jitter
-        const waitTime = Math.pow(2, attempt + 1) * 1000 + Math.random() * 2000;
+        // Rate limited — wait longer with exponential backoff + jitter
+        const waitTime = Math.pow(2, attempt + 2) * 1000 + Math.random() * 3000;
         console.log(`Rate limited, retrying in ${Math.round(waitTime / 1000)}s (attempt ${attempt + 1}/${maxRetries})`);
         await new Promise(resolve => setTimeout(resolve, waitTime));
         continue;
@@ -184,7 +184,7 @@ export async function chatWithGemini(
       temperature: 0.7,
       topP: 0.95,
       topK: 40,
-      maxOutputTokens: 8192,
+      maxOutputTokens: 4096,
     },
     safetySettings: [
       { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_NONE' },
